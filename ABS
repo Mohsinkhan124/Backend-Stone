@@ -30,4 +30,3 @@ GET = http://localhost:5000/api/blogs
 GET = http://localhost:5000/api/blogs/6a3131569fa16e700151d6a8
 UPDATE = http://localhost:5000/api/blogs/6a3131569fa16e700151d6a8 <= ADMIN
 DELETE = http://localhost:5000/api/blogs/6a3131569fa16e700151d6a8 <= ADMIN
-POST = http://localhost:5000/api/chat

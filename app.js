@@ -15,6 +15,7 @@ import testimonialRoutes from "./routes/testimonialRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import newsletterRoutes from "./routes/newsletterRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -36,6 +37,7 @@ app.use("/api/inquiries",  inquiryRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/testimonials", testimonialRoutes);
+app.use("/api/contact", contactRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/chat", chatRoutes);
