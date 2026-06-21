@@ -1,0 +1,33 @@
+POST = http://localhost:5000/api/categories
+GET = http://localhost:5000/api/categories
+POST = http://localhost:5000/api/admin/login  <= ADMIN
+GET = http://localhost:5000/api/admin/profile <= ADMIN
+GET = http://localhost:5000/api/categories/6a2570bbc57669f848b7ac7e   <= ADMIN
+PUT = http://localhost:5000/api/categories/6a2574cbf915f802b1db1836   <= ADMIN
+DELETE = http://localhost:5000/api/categories/6a2574cbf915f802b1db1836  <= ADMIN
+POST = http://localhost:5000/api/products    <= ADMIN
+GET = http://localhost:5000/api/products 
+GET = http://localhost:5000/api/products/6a29380dfbe5a9b0d04b59a9
+DELETE = http://localhost:5000/api/products/6a2947ab42ce9c442245f9b2
+POST = http://localhost:5000/api/inquiries
+GET =  http://localhost:5000/api/inquiries  <= ADMIN
+GET =  http://localhost:5000/api/:id  <= ADMIN
+UPDATE =  http://localhost:5000/api/:id  <= ADMIN
+DELETE =  http://localhost:5000/api/:id  <= ADMIN
+GET =  http://localhost:5000/api/dashboard <= ADMIN
+POST =  http://localhost:5000/api/gallery <=
+GET = http://localhost:5000/api/gallery
+GET = http://localhost:5000/api/gallery/6a2fccac2ee91d6d55ec5f5b
+PUT = http://localhost:5000/api/gallery/6a2fccac2ee91d6d55ec5f5b <= ADMIN
+DELETE = http://localhost:5000/api/gallery/6a2fccac2ee91d6d55ec5f5b <= ADMIN
+POST = http://localhost:5000/api/testimonials <= ADMIN
+GET =  http://localhost:5000/api/testimonials
+GET =  http://localhost:5000/api/testimonials/6a2fdda8cdbdd08748df2465
+UPDATE =  http://localhost:5000/api/testimonials/6a2fdda8cdbdd08748df2465 <= ADMIN
+DELETE =  http://localhost:5000/api/testimonials/6a2fdda8cdbdd08748df2465 <= ADMIN
+POST = http://localhost:5000/api/blogs <= ADMIN
+GET = http://localhost:5000/api/blogs
+GET = http://localhost:5000/api/blogs/6a3131569fa16e700151d6a8
+UPDATE = http://localhost:5000/api/blogs/6a3131569fa16e700151d6a8 <= ADMIN
+DELETE = http://localhost:5000/api/blogs/6a3131569fa16e700151d6a8 <= ADMIN
+POST = http://localhost:5000/api/chat
