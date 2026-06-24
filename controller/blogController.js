@@ -5,18 +5,24 @@ export const createBlog = async (req, res) => {
   try {
     const {
       title,
+      excerpt,
       content,
       image,
+      category,
       author,
+      readTime,
       featured,
     } = req.body;
 
     const blog = await Blog.create({
       title,
       slug: slugify(title, { lower: true }),
+      excerpt,
       content,
       image,
+      category,
       author,
+      readTime,
       featured,
     });
 

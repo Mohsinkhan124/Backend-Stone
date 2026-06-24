@@ -12,6 +12,12 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+    },
+
+    excerpt: {
+      type: String,
+      required: true,
     },
 
     content: {
@@ -24,9 +30,19 @@ const blogSchema = new mongoose.Schema(
       default: "",
     },
 
+    category: {
+      type: String,
+      default: "Marble Guide",
+    },
+
     author: {
       type: String,
       default: "Admin",
+    },
+
+    readTime: {
+      type: String,
+      default: "5 min read",
     },
 
     featured: {
