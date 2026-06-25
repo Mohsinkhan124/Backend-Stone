@@ -1,6 +1,7 @@
 import Product from "../model/Product.js";
 import Category from "../model/Category.js";
 import slugify from "slugify";
+import cloudinary from "../config/cloudinary.js";
 
 
 // Create a new product - Admin only
@@ -27,6 +28,24 @@ export const createProduct = async (req, res) => {
       });
     }
 
+    let imageUrl = "";
+
+if (req.file) {
+  const result = await new Promise((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        { folder: "wq-marble-products" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      )
+      .end(req.file.buffer);
+  });
+
+  imageUrl = result.secure_url;
+}
+
     const product = await Product.create({
       name,
       slug: slugify(name, {
@@ -35,7 +54,7 @@ export const createProduct = async (req, res) => {
       }),
       description,
       category,
-      images,
+      images: imageUrl ? [imageUrl] : [],
       price,
       featured,
       inStock,
