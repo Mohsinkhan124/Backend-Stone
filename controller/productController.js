@@ -47,19 +47,25 @@ if (req.file) {
 }
 
     const product = await Product.create({
-      name,
-      slug: slugify(name, {
-        lower: true,
-        strict: true,
-      }),
-      description,
-      category,
-      images: imageUrl ? [imageUrl] : [],
-      price,
-      featured,
-      inStock,
-      specifications,
-    });
+  name,
+  slug: slugify(name, {
+    lower: true,
+    strict: true,
+  }),
+  description,
+  category,
+  images: imageUrl ? [imageUrl] : [],
+  price,
+  featured,
+  inStock,
+
+  specifications: {
+    color: req.body.color,
+    finish: req.body.finish,
+    origin: req.body.origin,
+    application: req.body.application,
+  },
+});
 
     res.status(201).json({
       success: true,
