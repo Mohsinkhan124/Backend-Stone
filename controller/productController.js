@@ -6,6 +6,8 @@ import cloudinary from "../config/cloudinary.js";
 
 // Create a new product - Admin only
 export const createProduct = async (req, res) => {
+  console.log(req.body);
+console.log(req.file);
   try {
     const {
       name,
