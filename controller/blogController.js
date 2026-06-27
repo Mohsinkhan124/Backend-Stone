@@ -1,5 +1,6 @@
 import Blog from "../model/Blog.js";
 import slugify from "slugify";
+import cloudinary from "../config/cloudinary.js";
 
 export const createBlog = async (req, res) => {
   try {
@@ -7,19 +8,39 @@ export const createBlog = async (req, res) => {
       title,
       excerpt,
       content,
-      image,
       category,
       author,
       readTime,
       featured,
     } = req.body;
 
+    let imageUrl = "";
+
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { folder: "wq-marble-blogs" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          )
+          .end(req.file.buffer);
+      });
+
+      imageUrl = result.secure_url;
+    }
+
     const blog = await Blog.create({
       title,
-      slug: slugify(title, { lower: true }),
+      slug: slugify(title, {
+        lower: true,
+        strict: true,
+      }),
       excerpt,
       content,
-      image,
+      image: imageUrl,
       category,
       author,
       readTime,
@@ -86,7 +107,26 @@ export const updateBlog = async (req, res) => {
     const data = { ...req.body };
 
     if (data.title) {
-      data.slug = slugify(data.title, { lower: true });
+      data.slug = slugify(data.title, {
+        lower: true,
+        strict: true,
+      });
+    }
+
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { folder: "wq-marble-blogs" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          )
+          .end(req.file.buffer);
+      });
+
+      data.image = result.secure_url;
     }
 
     const blog = await Blog.findByIdAndUpdate(
