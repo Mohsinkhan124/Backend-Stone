@@ -1,4 +1,5 @@
 import Gallery from "../model/Gallery.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const createGallery = async (req, res) => {
   try {
@@ -6,15 +7,32 @@ export const createGallery = async (req, res) => {
       title,
       description,
       location,
-      images,
       featured,
     } = req.body;
+
+    let imageUrl = "";
+
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { folder: "wq-marble-gallery" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          )
+          .end(req.file.buffer);
+      });
+
+      imageUrl = result.secure_url;
+    }
 
     const gallery = await Gallery.create({
       title,
       description,
       location,
-      images,
+      images: imageUrl ? [imageUrl] : [],
       featured,
     });
 
@@ -75,11 +93,9 @@ export const getGalleryById = async (req, res) => {
 
 export const updateGallery = async (req, res) => {
   try {
-    const gallery = await Gallery.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const { title, description, location, featured } = req.body;
+
+    const gallery = await Gallery.findById(req.params.id);
 
     if (!gallery) {
       return res.status(404).json({
@@ -87,6 +103,33 @@ export const updateGallery = async (req, res) => {
         message: "Gallery not found",
       });
     }
+
+    let images = gallery.images;
+
+    // Agar nayi image upload hui ho
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { folder: "wq-marble-gallery" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          )
+          .end(req.file.buffer);
+      });
+
+      images = [result.secure_url];
+    }
+
+    gallery.title = title;
+    gallery.description = description;
+    gallery.location = location;
+    gallery.featured = featured;
+    gallery.images = images;
+
+    await gallery.save();
 
     res.status(200).json({
       success: true,

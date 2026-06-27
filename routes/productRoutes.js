@@ -10,6 +10,6 @@ router.get("/:id", getProductById);
 
 router.post("/", authMiddleware, upload.single("image"), createProduct);
 router.put("/:id", authMiddleware, upload.single("image"), updateProduct);
-router.delete("/:id", authMiddleware, deleteProduct);
+router.delete("/:id", authMiddleware, upload.single("image"), deleteProduct);
 
 export default router;

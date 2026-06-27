@@ -18,6 +18,6 @@ router.post("/", authMiddleware, upload.single("image"), createBlog);
 router.get("/", getAllBlogs);
 router.get("/:id", getBlogById);
 router.put("/:id", authMiddleware, upload.single("image"), updateBlog);
-router.delete("/:id", authMiddleware, deleteBlog);
+router.delete("/:id", authMiddleware, upload.single("image"), deleteBlog);
 
 export default router;
