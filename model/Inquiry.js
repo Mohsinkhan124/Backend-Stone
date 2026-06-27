@@ -8,9 +8,21 @@ const inquirySchema = new mongoose.Schema(
       trim: true,
     },
 
+    email: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     phone: {
       type: String,
       required: true,
+    },
+
+    subject: {
+      type: String,
+      default: "",
+      trim: true,
     },
 
     message: {

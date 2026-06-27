@@ -2,13 +2,22 @@ import Inquiry from "../model/Inquiry.js";
 
 export const createInquiry = async (req, res) => {
   try {
-    const { name, phone, message, product } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      subject,
+      message,
+      product,
+    } = req.body;
 
     const inquiry = await Inquiry.create({
       name,
+      email,
       phone,
+      subject,
       message,
-      product,
+      product: product || null,
     });
 
     res.status(201).json({
@@ -44,11 +53,11 @@ export const getAllInquiries = async (req, res) => {
   }
 };
 
-// GET SINGLE INQUIRY BY ID FOR ADMIN DASHBOARD
-
+// GET SINGLE INQUIRY
 export const getInquiryById = async (req, res) => {
   try {
-    const inquiry = await Inquiry.findById(req.params.id).populate("product");
+    const inquiry = await Inquiry.findById(req.params.id)
+      .populate("product");
 
     if (!inquiry) {
       return res.status(404).json({
@@ -69,8 +78,7 @@ export const getInquiryById = async (req, res) => {
   }
 };
 
-// UPDATE INQUIRY STATUS FOR ADMIN DASHBOARD
-
+// UPDATE STATUS
 export const updateInquiryStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -79,7 +87,7 @@ export const updateInquiryStatus = async (req, res) => {
       req.params.id,
       { status },
       { new: true }
-    );
+    ).populate("product");
 
     if (!inquiry) {
       return res.status(404).json({
@@ -101,8 +109,7 @@ export const updateInquiryStatus = async (req, res) => {
   }
 };
 
-// DELETE INQUIRY FOR ADMIN DASHBOARD
-
+// DELETE
 export const deleteInquiry = async (req, res) => {
   try {
     const inquiry = await Inquiry.findByIdAndDelete(req.params.id);
