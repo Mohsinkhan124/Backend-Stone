@@ -74,7 +74,7 @@ export const deleteSubscriber = async (req, res) => {
 // GET /newsletter/unread-count
 export const getUnreadSubscriberCount = async (req, res) => {
   try {
-    const count = await Subscriber.countDocuments({ isRead: false });
+    const count = await Newsletter.countDocuments({ isRead: false });
 
     res.json({
       success: true,
@@ -91,7 +91,7 @@ export const getUnreadSubscriberCount = async (req, res) => {
 // PATCH /newsletter/mark-all-read
 export const markAllSubscriberRead = async (req, res) => {
   try {
-    await Subscriber.updateMany(
+    await Newsletter.updateMany(
       { isRead: false },
       { $set: { isRead: true } }
     );
