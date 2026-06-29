@@ -6,12 +6,13 @@ const router = express.Router();
 
 router.post("/", createInquiry);
 
+router.get("/unread-count", authMiddleware, getUnreadInquiryCount);
+router.patch("/mark-all-read", authMiddleware, markAllInquiryRead);
+
 // admin protected
 router.get("/", authMiddleware, getAllInquiries);
 router.get("/:id", authMiddleware, getInquiryById);
 router.put("/:id", authMiddleware, updateInquiryStatus);
 router.delete("/:id", authMiddleware, deleteInquiry);
-router.get("/unread-count", authMiddleware, getUnreadInquiryCount);
-router.patch("/mark-all-read", authMiddleware, markAllInquiryRead);
 
 export default router;
