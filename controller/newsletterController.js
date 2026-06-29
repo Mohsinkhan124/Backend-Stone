@@ -70,3 +70,40 @@ export const deleteSubscriber = async (req, res) => {
     });
   }
 };
+
+// GET /newsletter/unread-count
+export const getUnreadSubscriberCount = async (req, res) => {
+  try {
+    const count = await Subscriber.countDocuments({ isRead: false });
+
+    res.json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// PATCH /newsletter/mark-all-read
+export const markAllSubscriberRead = async (req, res) => {
+  try {
+    await Subscriber.updateMany(
+      { isRead: false },
+      { $set: { isRead: true } }
+    );
+
+    res.json({
+      success: true,
+      message: "All subscribers marked as read",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

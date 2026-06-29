@@ -35,12 +35,15 @@ const inquirySchema = new mongoose.Schema(
       ref: "Stone_Product",
       default: null,
     },
-
     status: {
       type: String,
       enum: ["new", "contacted", "completed"],
       default: "new",
     },
+    isRead: {
+      type: Boolean,
+      default: false,
+   }
   },
   {
     timestamps: true,

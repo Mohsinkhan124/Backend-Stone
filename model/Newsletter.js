@@ -9,6 +9,10 @@ const newsletterSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    isRead: {
+      type: Boolean,
+      default: false,
+   }
   },
   {
     timestamps: true,

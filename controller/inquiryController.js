@@ -132,3 +132,40 @@ export const deleteInquiry = async (req, res) => {
     });
   }
 };
+
+// GET /inquiries/unread-count
+export const getUnreadInquiryCount = async (req, res) => {
+  try {
+    const count = await Inquiry.countDocuments({ isRead: false });
+
+    res.json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// PATCH /inquiries/mark-all-read
+export const markAllInquiryRead = async (req, res) => {
+  try {
+    await Inquiry.updateMany(
+      { isRead: false },
+      { $set: { isRead: true } }
+    );
+
+    res.json({
+      success: true,
+      message: "All inquiries marked as read",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
