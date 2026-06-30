@@ -1,6 +1,7 @@
 import express from "express";
 import Product from "../model/Product.js";
 import "dotenv/config";
+import Category from "../model/Category.js";
 
 const router = express.Router();
 
@@ -35,6 +36,10 @@ function isPriceQuery(message) {
 
 
 // 🧠 DETECT INTENT
+// NOTE: kitchen/bathroom/flooring/outdoor flags are kept ONLY because the
+// Gemini prompt below still references "Detected intent" for tone/context
+// (cheap/premium are also still used there). They are NO LONGER used for
+// category matching — that's now fully dynamic (see detectCategory below).
 function detectIntent(message) {
   const msg = message.toLowerCase();
 
@@ -42,9 +47,35 @@ function detectIntent(message) {
     kitchen: msg.includes("kitchen"),
     bathroom: msg.includes("bathroom"),
     flooring: msg.includes("floor"),
+    outdoor: msg.includes("outdoor"),
     cheap: msg.includes("cheap") || msg.includes("low"),
     premium: msg.includes("premium") || msg.includes("luxury"),
   };
+}
+
+// ----------------------------------------------------------------
+// IMPROVEMENT 2: DYNAMIC CATEGORY DETECTION
+//
+// Instead of hardcoded if/else checks against fixed slugs (bathroom,
+// kitchen, flooring, outdoor), this pulls ALL categories from the DB
+// and checks if the user's message mentions any category's `name` or
+// `slug`. This means any category you add later (Bedroom, Stairs,
+// Living Room, etc.) is automatically detected with zero code changes.
+// ----------------------------------------------------------------
+async function detectCategory(message) {
+  const msg = message.toLowerCase();
+  const categories = await Category.find({});
+
+  return (
+    categories.find((cat) => {
+      const name = (cat.name || "").toLowerCase();
+      const slug = (cat.slug || "").toLowerCase();
+      return (
+        (name && msg.includes(name)) ||
+        (slug && msg.includes(slug))
+      );
+    }) || null
+  );
 }
 
 router.post("/", async (req, res) => {
@@ -57,27 +88,55 @@ router.post("/", async (req, res) => {
     const priceMode = isPriceQuery(message);
     const intent = detectIntent(message);
 
-
     if (!memory[userId]) memory[userId] = [];
     memory[userId].push(message);
     const lastMessages = memory[userId].slice(-5);
 
+    // ----------------------------------------------------------------
+    // PRODUCT RECOMMENDATION LOGIC
+    //
+    // `products` is assigned exactly once at the end of this block.
+    //
+    // Resolution order:
+    //   1. Dynamic category match (any category in the DB, by name or
+    //      slug) -> return ONLY that category's products
+    //   2. No category matched -> text search across name / description
+    //      / specifications.application / specifications.color
+    //   3. Still nothing found (IMPROVEMENT 1) -> fall back to the
+    //      first 3 products in the catalog so the AI always has
+    //      something to recommend instead of an empty list
+    //   4. Final safety net (IMPROVEMENT 1) -> results are always
+    //      capped at a maximum of 5 products
+    // ----------------------------------------------------------------
 
-    let products = await Product.find({
-      $or: [
-        { name: { $regex: message, $options: "i" } },
-        { description: { $regex: message, $options: "i" } },
-        { "specifications.color": { $regex: message, $options: "i" } },
-        { "specifications.application": { $regex: message, $options: "i" } }
-      ]
-    });
+    const matchedCategory = await detectCategory(message);
 
-    if (products.length === 0) {
-      products = await Product.find().limit(3);
+    let products;
+
+    if (matchedCategory) {
+      // Step 1: category identified dynamically — return ONLY its products
+      products = await Product.find({ category: matchedCategory._id });
+    } else {
+      // Step 2: no category matched, fall back to text search
+      products = await Product.find({
+        $or: [
+          { name: { $regex: message, $options: "i" } },
+          { description: { $regex: message, $options: "i" } },
+          { "specifications.application": { $regex: message, $options: "i" } },
+          { "specifications.color": { $regex: message, $options: "i" } },
+        ],
+      });
     }
 
-    products = products.slice(0, 5);
+    // Step 3: if everything above returned nothing, fall back to the
+    // first 3 products in the catalog as generic recommendations
+    if (!products || products.length === 0) {
+      products = await Product.find({}).limit(3);
+    }
 
+    // Step 4: hard cap — never send more than 5 products to the AI/UI
+      products = products.slice(0, 3);
+    
 
     let aiInstruction = "";
 
@@ -119,7 +178,9 @@ RULES:
 You are a professional marble sales assistant AI.
 
 RULES:
-- Understand user intent (kitchen, bathroom, flooring, cheap, luxury)
+- Understand the user's intent and recommend products based on the detected product category.
+If products are provided, recommend only those products.
+Never recommend products outside the provided product list.
 - Use chat history for context
 - Recommend best products first
 - If no exact match, suggest alternatives
